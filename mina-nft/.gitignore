@@ -12,3 +12,5 @@ coverage
 # Project
 dist
 public/js
+
+**/*.idea
