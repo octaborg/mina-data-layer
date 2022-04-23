@@ -124,6 +124,7 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
   await tx.send().wait().catch(e => console.log(e));
 
   console.log(await getSnappState(snappAddress));
+  console.log(convertFieldstoCID(metaDataPointers).toString());
   isDeploying = null;
   return snappAddress;
 }
@@ -136,12 +137,37 @@ async function getSnappState(snappAddress: PublicKey) {
   };
 }
 
-function convertCIDtoFields(cid: CID): Field[] {
+export function convertFieldstoCID(f: Field[]) {
+  let bits = new Array<Bool>();
+  for (let i = 0; i < f.length; i++) {
+    //console.log(f[i].toBits());
+    bits.push(...f[i].toBits());
+  }
+  // console.log(bits.toString());
+  let numbers = [];
+  for (let i = 0; i < bits.length; i++) {
+    let s = '';
+    for (let j = 0; j < 8; j++) {
+      s = s.concat(bits[i].equals(true) ? '1' : '0');
+    }
+    console.log('cid-> ', s);
+    numbers.push(parseInt(s, 2));
+    if (numbers.length == 287) {
+      break;
+    }
+  }
+  let bytes = Uint8Array.of(...numbers);
+  console.log(bytes.length);
+  return CID.decode(bytes);
+}
+
+export function convertCIDtoFields(cid: CID): Field[] {
   let fields = new Array<Field>();
   let bit = 0;
   let bools = new Array<Bool>();
   for (let i = 0; i < cid.bytes.length; i++) {
     let b = cid.bytes[i].toString(2).padStart(8, '0');
+    //console.log('ff-> ', b);
     for (let j = 0; j < b.length; j++) {
       let c = new Bool(b.at(j) == '1');
       bools.push(c);
