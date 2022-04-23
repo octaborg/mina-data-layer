@@ -1,5 +1,7 @@
 # mina-data-layer
 
+Project: Creates a Data Acess Layer for expanding the off chain storage for Mina using IPFS with FileCoin.
+
 Steps to run:
 
 1. Create an account at https://web3.storage/ and copy your API token. If you don't have one, create one and copy it.
