@@ -14,25 +14,35 @@ import {
 } from 'snarkyjs';
 import {store} from "./filecoin.js";
 import {CID} from "multiformats";
+import {declareMethodArguments, declareState} from "./util.js";
 
 export { mint, getSnappState, NFTMetaData };
 
 await isReady;
 
-
-
 /**
  *
  */
 export default class NFT extends SmartContract {
-  @state(Field) metaDataPointer = State<Field>();
-  @state(Field) metaDataPointer2 = State<Field>();
+  metaDataPointer;
+  metaDataPointer2;
   owner: PublicKey;
 
   constructor(address: PublicKey, owner: PublicKey) {
     super(address);
     // set the public key of the players
     this.owner = owner;
+
+    let key = "metaDataPointer";
+    let v = State();
+    v._init(key, Field, this, NFT);
+    this[key] = v;
+
+    let key1 = "metaDataPointer2";
+    let v1 = State();
+    v1._init(key1, Field, this, NFT);
+    this[key1] = v1;
+    console.log(this.metaDataPointer2);
   }
 
   // mint
@@ -58,6 +68,10 @@ export default class NFT extends SmartContract {
     this.owner = newOwner;
   }
 }
+
+declareState(NFT, {metaDataPointer: Field});
+declareState(NFT, {metaDataPointer2: Field});
+declareMethodArguments(NFT, {transfer: [PublicKey, PublicKey, Signature]});
 
 // setup
 
@@ -93,18 +107,12 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
   };
   //isDeploying = snappInterface;
 
-  // TODO publish NFTMetaData to FileCoin and get the pointer
-  // const fileInput = document.querySelector('input[type="file"]')
-  // fileInput.
   let cidStr = await store(null, meta);//.catch(e => console.log(e));
   let cid = CID.parse(cidStr);
   let metaDataPointers: Field[] = convertCIDtoFields(cid);
   let metaDataPointer: Field = metaDataPointers[0];
   let metaDataPointer1: Field = metaDataPointers[1];
-  let snapp = new NFT(
-    snappAddress,
-      account1.toPublicKey()
-  );
+  let snapp = new NFT(snappAddress, account1.toPublicKey());
   let tx = Mina.transaction(account1, async () => {
     console.log('Deploying NFT...');
     const initialBalance = UInt64.fromNumber(1000000);

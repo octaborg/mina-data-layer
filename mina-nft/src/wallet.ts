@@ -1,6 +1,20 @@
-import { Field, SmartContract, state, State, method, UInt64, Mina, Party, PrivateKey, PublicKey, isReady } from 'snarkyjs';
+import {
+    Field,
+    SmartContract,
+    state,
+    State,
+    method,
+    UInt64,
+    Mina,
+    Party,
+    PrivateKey,
+    PublicKey,
+    isReady,
+    AsFieldElements
+} from 'snarkyjs';
+import {declareMethodArguments, declareState} from "./util.js";
 
-export { deployWallet, getSnappState };
+export {deployWallet, getSnappState};
 
 await isReady;
 
@@ -8,12 +22,21 @@ await isReady;
  *
  */
 class Wallet extends SmartContract {
-    @state(Field) metaDataPointer = State<Field>();
+    //@state(Field) metaDataPointer = State<Field>();
+    metaDataPointer;
+
+    constructor(address: PublicKey) {
+        super(address);
+        let key = "metaDataPointer";
+        let v = State();
+        v._init("metaDataPointer", Field, this, Wallet);
+        this[key] = v;
+    }
 
     deploy(initialBalance: UInt64, metaDataPointer: Field = Field(1)) {
         super.deploy();
         this.balance.addInPlace(initialBalance);
-        //this.metaDataPointer.set(metaDataPointer);
+        this.metaDataPointer.set(metaDataPointer);
     }
 
     /**
@@ -21,14 +44,16 @@ class Wallet extends SmartContract {
      * 1. Store the signed NFTs data in Filecoin
      * 2. Mint the NFT with the hash/link of the data
      * 3. Retrieve the Wallet data(list of nfts) from FileCoin and update the registry and republish
-     * 4. Publish the NFT address to the NFTRegistry with the owner
+     * 4. Publish the NFT address to the NFTRedeclareStategistry with the owner
      */
-    @method async update(data: Field) {
+    @method
+    async update(data: Field) {
         this.metaDataPointer.set(data);
     }
 }
 
-// setup
+declareState(Wallet, {metaDataPointer: Field});
+declareMethodArguments(Wallet, {update: [Field]});
 
 let isDeploying = null as null | {
     update(account1: PrivateKey, nft: PublicKey): Promise<void>;
@@ -43,7 +68,7 @@ async function deployWallet(account1: PrivateKey, account2: PrivateKey, metaData
     let snappAddress = snappPrivkey.toPublicKey();
     let snappInterface = {
         update(account1: PrivateKey, nft: PublicKey) {
-          return update(account1, nft, snappAddress);
+            return update(account1, nft, snappAddress);
         },
         getSnappState() {
             return getSnappState(snappAddress);
@@ -54,11 +79,13 @@ async function deployWallet(account1: PrivateKey, account2: PrivateKey, metaData
     let snapp = new Wallet(
         snappAddress,
     );
+    console.log(snapp.metaDataPointer);
     let tx = Mina.transaction(account1, async () => {
         console.log('Deploying NFTRegistry...');
         const initialBalance = UInt64.fromNumber(1000000);
         const p = await Party.createSigned(account2);
         p.balance.subInPlace(initialBalance);
+        console.log(snapp.metaDataPointer);
         snapp.deploy(initialBalance, metaDataPointer);
     });
     await tx.send().wait();
@@ -69,18 +96,18 @@ async function deployWallet(account1: PrivateKey, account2: PrivateKey, metaData
 
 
 async function update(account1: PrivateKey, nft: PublicKey, snappAddress: PublicKey) {
-  let snapp = new Wallet(snappAddress);
+    let snapp = new Wallet(snappAddress);
 
-  // TODO retrieve, update and publish registry data to FileCoin here
-  let tx = Mina.transaction(account1, async () => {
-      // TODO Update the FileCoin Address here
-    await snapp.update(new Field(10000));
-  });
-  try {
-    await tx.send().wait();
-  } catch (err) {
-    console.log('Update rejected!', err);
-  }
+    // TODO retrieve, update and publish registry data to FileCoin here
+    let tx = Mina.transaction(account1, async () => {
+        // TODO Update the FileCoin Address here
+        await snapp.update(new Field(10000));
+    });
+    try {
+        await tx.send().wait();
+    } catch (err) {
+        console.log('Update rejected!', err);
+    }
 }
 
 

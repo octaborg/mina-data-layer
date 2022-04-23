@@ -48,8 +48,7 @@ function FileUpload() {
       console.log("done");
     }
   }
-  
-  
+
   return(
     <Container fixed>
       <Stack direction="column" spacing={2}>
