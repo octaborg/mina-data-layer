@@ -19,6 +19,8 @@ export { mint, getSnappState, NFTMetaData };
 
 await isReady;
 
+
+
 /**
  *
  */

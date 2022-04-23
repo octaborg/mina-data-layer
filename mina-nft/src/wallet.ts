@@ -1,6 +1,6 @@
 import { Field, SmartContract, state, State, method, UInt64, Mina, Party, PrivateKey, PublicKey, isReady } from 'snarkyjs';
 
-export { deployRegistry, getSnappState };
+export { deployWallet, getSnappState };
 
 await isReady;
 
@@ -37,7 +37,7 @@ let isDeploying = null as null | {
     }>;
 };
 
-async function deployRegistry(account1: PrivateKey, account2: PrivateKey, metaDataPointer: Field) {
+async function deployWallet(account1: PrivateKey, account2: PrivateKey, metaDataPointer: Field) {
     if (isDeploying) return isDeploying;
     const snappPrivkey = PrivateKey.random();
     let snappAddress = snappPrivkey.toPublicKey();
