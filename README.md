@@ -6,4 +6,4 @@ Steps to run:
 2. Launch app and open http://localhost:3000/
 3. Paste the API Token and Submit.
 4. Select the file that you would like to Mint NFT with and click mint.
-5. Your NFT will be minted + Stored in IPFS using filecoin and show in the image list of the Web UI. 
+5. Your NFT will be minted + Stored in IPFS using FileCoin and show in the image list of the Web UI. 
