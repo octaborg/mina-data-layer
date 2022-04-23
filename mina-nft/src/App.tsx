@@ -16,7 +16,7 @@ function App() {
   async function deploy() {
     if (isLoading) return;
     setLoading(true);
-    Add = await import('../dist/add.js');
+    Add = await import('../dist/NFT.js');
     let snapp = await Add.deploy();
     setLoading(false);
     setDeployed(true);
