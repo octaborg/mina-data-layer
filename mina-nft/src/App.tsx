@@ -33,7 +33,7 @@ function FileUpload() {
     if (!fileList) return;
     //console.log(fileList);
     setFileToUpload(fileList[0]);
-  };
+  }
   
   
   async function uploadHandler(event: React.MouseEvent<HTMLSpanElement, MouseEvent>) {

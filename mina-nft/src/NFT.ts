@@ -79,8 +79,8 @@ class NFTMetaData {
   }
 }
 
-async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaData) {
-  if (isDeploying) return isDeploying;
+async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaData) : Promise<PublicKey>{
+  //if (isDeploying) return isDeploying;
   const snappPrivkey = PrivateKey.random();
   let snappAddress = snappPrivkey.toPublicKey();
   let snappInterface = {

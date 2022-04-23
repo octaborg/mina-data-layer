@@ -13,7 +13,7 @@ class Wallet extends SmartContract {
     deploy(initialBalance: UInt64, metaDataPointer: Field = Field(1)) {
         super.deploy();
         this.balance.addInPlace(initialBalance);
-        this.metaDataPointer.set(metaDataPointer);
+        //this.metaDataPointer.set(metaDataPointer);
     }
 
     /**
