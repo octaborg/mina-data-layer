@@ -10,8 +10,10 @@ import {
   PrivateKey,
   PublicKey,
   isReady,
-  Signature
+  Signature, Bool
 } from 'snarkyjs';
+import {store} from "./filecoin.js";
+import {CID} from "multiformats";
 
 export { mint, getSnappState, NFTMetaData };
 
@@ -22,6 +24,7 @@ await isReady;
  */
 export default class NFT extends SmartContract {
   @state(Field) metaDataPointer = State<Field>();
+  @state(Field) metaDataPointer2 = State<Field>();
   owner: PublicKey;
 
   constructor(address: PublicKey, owner: PublicKey) {
@@ -31,10 +34,11 @@ export default class NFT extends SmartContract {
   }
 
   // mint
-  deploy(initialBalance: UInt64, metaDataPointer: Field = Field(1)) {
+  deploy(initialBalance: UInt64, metaDataPointer: Field, metaDataPointer2: Field) {
     super.deploy();
     this.balance.addInPlace(initialBalance);
     this.metaDataPointer.set(metaDataPointer);
+    this.metaDataPointer2.set(metaDataPointer2);
   }
 
   @method async transfer(
@@ -58,7 +62,8 @@ export default class NFT extends SmartContract {
 let isDeploying = null as null | {
   //update(): Promise<void>;
   getSnappState(): Promise<{
-    num: Field;
+    metaDataPointer: Field;
+    metaDataPointer1: Field;
   }>;
 };
 
@@ -87,8 +92,13 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
   isDeploying = snappInterface;
 
   // TODO publish NFTMetaData to FileCoin and get the pointer
-  let metaDataPointer: Field = Field.zero;
-
+  // const fileInput = document.querySelector('input[type="file"]')
+  // fileInput.
+  let cidStr = await store(null, meta);//.catch(e => console.log(e));
+  let cid = CID.parse(cidStr);
+  let metaDataPointers: Field[] = convertCIDtoFields(cid);
+  let metaDataPointer: Field = metaDataPointers[0];
+  let metaDataPointer1: Field = metaDataPointers[1];
   let snapp = new NFT(
     snappAddress,
       account1.toPublicKey()
@@ -98,10 +108,12 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
     const initialBalance = UInt64.fromNumber(1000000);
     const p = await Party.createSigned(account2);
     p.balance.subInPlace(initialBalance);
-    snapp.deploy(initialBalance, metaDataPointer);
+    //console.log(metaDataPointer, metaDataPointer1)
+    snapp.deploy(initialBalance, metaDataPointer, metaDataPointer1);
   });
-  await tx.send().wait();
+  await tx.send().wait().catch(e => console.log(e));
 
+  console.log(await getSnappState(snappAddress));
   isDeploying = null;
   return snappAddress;
 }
@@ -109,7 +121,31 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
 async function getSnappState(snappAddress: PublicKey) {
   let snappState = (await Mina.getAccount(snappAddress)).snapp.appState;
   return {
-    metaDataPointer: snappState[0]
+    metaDataPointer: snappState[0],
+    metaDataPointer1: snappState[1]
   };
+}
+
+function convertCIDtoFields(cid: CID): Field[] {
+  let fields = new Array<Field>();
+  let bit = 0;
+  let bools = new Array<Bool>();
+  for (let i = 0; i < cid.bytes.length; i++) {
+    let b = cid.bytes[i].toString(2).padStart(8, '0');
+    for (let j = 0; j < b.length; j++) {
+      let c = new Bool(b.at(j) == '1');
+      bools.push(c);
+      bit += 1;
+      if (bools.length == 255 || bit == (cid.bytes.length * 8) - 1) {
+        console.log(bools.length);
+        fields.push(Field.ofBits(bools));
+        bools = new Array<Bool>();
+      }
+    }
+  }
+  if (fields.length > 8) {
+    throw new Error('Mina does not allow more than 8 field elements in a contract');
+  }
+  return fields;
 }
 
