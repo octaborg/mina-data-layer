@@ -20,6 +20,7 @@ export { mint, getSnappState, NFTMetaData };
 
 await isReady;
 
+let filenames: string[];
 /**
  *
  */
@@ -93,10 +94,7 @@ class NFTMetaData {
   }
 }
 
-async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaData) : Promise<{
-  address: PublicKey,
-  ipfsUrl: string
-}>{
+async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaData) : Promise<PublicKey>{
   //if (isDeploying) return isDeploying;
   const snappPrivkey = PrivateKey.random();
   let snappAddress = snappPrivkey.toPublicKey();
@@ -111,7 +109,7 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
   //isDeploying = snappInterface;
 
   let cidStr = await store(null, meta);//.catch(e => console.log(e));
-  let cid = CID.parse(cidStr[0]);
+  let cid = CID.parse(cidStr);
   let metaDataPointers: Field[] = convertCIDtoFields(cid);
   let metaDataPointer: Field = metaDataPointers[0];
   let metaDataPointer1: Field = metaDataPointers[1];
@@ -127,12 +125,11 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
   await tx.send().wait().catch(e => console.log(e));
 
   console.log(await getSnappState(snappAddress));
-  console.log(convertFieldstoCID(metaDataPointers).toString());
+  const fileinfo = convertFieldstoCID(metaDataPointers).toString();
+  filenames.push(fileinfo);
+  console.log(filenames);
   isDeploying = null;
-  return {
-    address: snappAddress,
-    ipfsUrl: cidStr[1]
-  };
+  return snappAddress;
 }
 
 async function getSnappState(snappAddress: PublicKey) {
