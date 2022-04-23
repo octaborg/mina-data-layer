@@ -8,61 +8,58 @@ import Grid from '@mui/material/Grid';
 import {Paper, TextField, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import { alpha } from '@mui/material/styles';
+import {mint, NFTMetaData} from "./NFT.js";
+import {isReady, Mina, Field} from "snarkyjs";
+import {deployWallet} from "./wallet.js";
 
 let Add;
+let address;
 
-/*
+await isReady;
+const Local = Mina.LocalBlockchain();
+Mina.setActiveInstance(Local);
+const account1 = Local.testAccounts[0].privateKey;
+const account2 = Local.testAccounts[1].privateKey;
+
+let wallet = await deployWallet(account1, account2, Field.zero);
+
 function FileUpload() {
-
-  //
-  const [selectedFile, setSelectedFile] = useState();
-  const [isFilePicked, setIsFilePicked] = useState(false);
-//
-
-
-  const [fileSelected, setFileSelected] = React.useState<File>()
   
-  
-  
-  //
-  function changeHandler(event: Event) {
-    setSelectedFile(event.currentTarget.files[0]);
-    setIsFilePicked(true);
-  };
-  //
+  const [fileToUpload, setFileToUpload] = React.useState<File>();
 
-  
-  function changeHandler(e: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
-    if (fileSelected) {
-        const formData = new FormData();
-        formData.append("image", fileSelected, fileSelected.name);
-    }
-  };
-  
-
-  const handleImageChange = function (e: React.ChangeEvent<HTMLInputElement>) {
+  function changeHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const fileList = e.target.files;
 
     if (!fileList) return;
-
-    setFileSelected(fileList[0]);
+    //console.log(fileList);
+    setFileToUpload(fileList[0]);
   };
   
-  function handleSubmission() {
-    console.log("submission handled");
+  
+  async function uploadHandler(event: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
+
+    if (fileToUpload) {
+      const formData = new FormData();
+      formData.append("image", fileToUpload, fileToUpload.name);
+      console.log(formData.values());
+
+      address = await mint(account1, account2, new NFTMetaData(fileToUpload, new Map()));
+      await wallet.update(account1, address);
+      console.log("done");
+    }
   }
   
   
   return(
     <Container fixed>
       <Stack direction="column" spacing={2}>
-        <input type="file" name="file" onChange={changeHandler} />
-        <button onClick = {handleSubmission} > Submit </button>
+        <input type="file" name="photo" id="image" onChange = {changeHandler}/>
+        <button onClick = {uploadHandler} > Mint </button>
       </Stack>
     </Container>
   );
 }
-*/
+
 
 /*
 function InitialBox() {
@@ -181,7 +178,7 @@ function App() {
     */
     
    return (
-      <LoginBox/>
+      <FileUpload/>
    );
 }
 

@@ -91,7 +91,7 @@ async function mint(account1: PrivateKey, account2: PrivateKey, meta: NFTMetaDat
       return getSnappState(snappAddress);
     },
   };
-  isDeploying = snappInterface;
+  //isDeploying = snappInterface;
 
   // TODO publish NFTMetaData to FileCoin and get the pointer
   // const fileInput = document.querySelector('input[type="file"]')
