@@ -1,6 +1,6 @@
-import {deployRegistry} from "./NFTRegistry.js";
+import {deployRegistry} from "./wallet.js";
 import {isReady, Mina, Field} from "snarkyjs";
-import {mint} from "./NFT.js";
+import {mint, NFTMetaData} from "./NFT.js";
 
 await isReady;
 
@@ -16,9 +16,11 @@ async function main() {
     console.log(snappState);
 
     // Mint NFT
-    let address = await mint(account1, account2, new Field(100));
+    let address = await mint(account1, account2, new NFTMetaData());
     await registry.update(account1, address);
     console.log("done");
+    snappState = await registry.getSnappState();
+    console.log(snappState);
 }
 
 main();

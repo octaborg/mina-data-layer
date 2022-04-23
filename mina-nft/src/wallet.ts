@@ -7,7 +7,7 @@ await isReady;
 /**
  *
  */
-class NFTRegistry extends SmartContract {
+class Wallet extends SmartContract {
     @state(Field) metaDataPointer = State<Field>();
 
     deploy(initialBalance: UInt64, metaDataPointer: Field = Field(1)) {
@@ -20,7 +20,7 @@ class NFTRegistry extends SmartContract {
      * Steps to mint a new NFT
      * 1. Store the signed NFTs data in Filecoin
      * 2. Mint the NFT with the hash/link of the data
-     * 3. Retrieve the NFTRegistry data from FileCoin and update the registry and republish
+     * 3. Retrieve the Wallet data(list of nfts) from FileCoin and update the registry and republish
      * 4. Publish the NFT address to the NFTRegistry with the owner
      */
     @method async update(data: Field) {
@@ -33,7 +33,7 @@ class NFTRegistry extends SmartContract {
 let isDeploying = null as null | {
     update(account1: PrivateKey, nft: PublicKey): Promise<void>;
     getSnappState(): Promise<{
-        num: Field;
+        metaDataPointer: Field;
     }>;
 };
 
@@ -51,7 +51,7 @@ async function deployRegistry(account1: PrivateKey, account2: PrivateKey, metaDa
     };
     isDeploying = snappInterface;
 
-    let snapp = new NFTRegistry(
+    let snapp = new Wallet(
         snappAddress,
     );
     let tx = Mina.transaction(account1, async () => {
@@ -69,7 +69,7 @@ async function deployRegistry(account1: PrivateKey, account2: PrivateKey, metaDa
 
 
 async function update(account1: PrivateKey, nft: PublicKey, snappAddress: PublicKey) {
-  let snapp = new NFTRegistry(snappAddress);
+  let snapp = new Wallet(snappAddress);
 
   // TODO retrieve, update and publish registry data to FileCoin here
   let tx = Mina.transaction(account1, async () => {
@@ -87,6 +87,6 @@ async function update(account1: PrivateKey, nft: PublicKey, snappAddress: Public
 async function getSnappState(snappAddress: PublicKey) {
     let snappState = (await Mina.getAccount(snappAddress)).snapp.appState;
     return {
-        num: snappState[0]
+        metaDataPointer: snappState[0]
     };
 }
