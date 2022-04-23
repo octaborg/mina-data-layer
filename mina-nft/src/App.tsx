@@ -37,15 +37,14 @@ function FileUpload() {
   
   
   async function uploadHandler(event: React.MouseEvent<HTMLSpanElement, MouseEvent>) {
-
     if (fileToUpload) {
       const formData = new FormData();
       formData.append("image", fileToUpload, fileToUpload.name);
       console.log(formData.values());
 
       address = await mint(account1, account2, new NFTMetaData(fileToUpload, new Map()));
-      await wallet.update(account1, address);
-      console.log("done");
+      await wallet.update(account1, address.address);
+      console.log(address.ipfsUrl);
     }
   }
 
