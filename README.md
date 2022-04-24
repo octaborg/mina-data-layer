@@ -1,7 +1,12 @@
 # mina-data-layer
 
+## what is it?
 Project: Creates a Data Acess Layer for expanding the off chain storage for Mina using IPFS with FileCoin.
 
+## How to setup the zkApp?
+
+
+## How to run the zkApp?
 Steps to run:
 
 1. Create an account at https://web3.storage/ and copy your API token. If you don't have one, create one and copy it.
