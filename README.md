@@ -5,7 +5,7 @@ Project: Creates a Data Acess Layer for expanding the off chain storage for Mina
 
 
 ## Dependencies
-Please ensure you have node v16 and npm installed
+Please ensure you have node v16 and npm installed.
 
 ## How to setup the zkApp
 1. Clone the following repo and build.
