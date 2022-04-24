@@ -11,11 +11,68 @@ import { alpha } from '@mui/material/styles';
 import {mint, NFTMetaData} from "./NFT.js";
 import {isReady, Mina, Field} from "snarkyjs";
 import {deployWallet} from "./wallet.js";
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import {File} from "web3.storage";
+
+
+import { Drawer, useTheme } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+import { purple } from '@mui/material/colors';
+
+const myTheme = createTheme({
+  palette: {
+    primary: {
+      light: '#ff9d3f',
+      main: '#ef6c00',
+      dark: '#b53d00',
+    },
+    secondary: {
+      light: '#d9c6ff',
+      main: '#400b87',
+      dark: '#030059',
+    },
+  },
+});
+
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 let address;
 let dataNFTs = [{
@@ -68,13 +125,36 @@ function FileUpload() {
   }
 
   return(
-    <Container fixed>
+    <>
+    <Container sx={{ width: 300 }}>
       <Stack direction="column" spacing={2}>
-        <input type="file" name="photo" id="image" onChange = {changeHandler}/>
-        <button onClick = {uploadHandler} > Mint </button>
+
+        <Button
+          variant="outlined"
+          component="label"
+        >
+          Upload Image
+          <input
+            type="file"
+            name="photo"
+            id="image"
+            onChange={changeHandler}
+            hidden />
+        </Button>
+        <Box bgcolor={myTheme.palette.secondary.light} />
+        <Button
+          onClick={uploadHandler}
+          sx={{ m: 3, p: 2 }}
+          variant="contained"
+        >
+          Mint
+        </Button>
+        <Box />
       </Stack>
-      <Gallery imageList={imageList}/>
-    </Container>
+    </Container><Container fixed>
+        <Gallery imageList={imageList} />
+      </Container>
+      </>
   );
 }
 
@@ -83,10 +163,36 @@ interface BorrowTableProps {
   imageList: Array<any>;
 }
 
+
 function Gallery(props: BorrowTableProps) {
   const {imageList} = props;
 
   return (
+
+    <Box sx={{}}>
+      <ImageList variant="masonry" cols={3} gap={8}>
+        {imageList.map((item) => (
+          <ImageListItem key={item.img}>
+            <img
+            crossOrigin="anonymous"
+            src={`${item.img}?w=248&fit=crop&auto=format`}
+            //srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+            alt={item.title}
+            //loading="lazy"
+          />
+          <ImageListItemBar 
+            position="below" 
+            title={item.title}
+            sx={{textAlign: "center", fontWeight: 'medium', fontSize: 'h3.fontSize', fontFamily: 'Monospace'}}
+          />
+        </ImageListItem>
+      ))}
+    </ImageList>
+  </Box>
+);
+}
+
+/*
     <ImageList>
       {imageList.map((item) => (
         <ImageListItem key={item.img}>
@@ -100,12 +206,14 @@ function Gallery(props: BorrowTableProps) {
           <ImageListItemBar
             title={item.title}
             position="below"
+            sx={{textAlign: "center", fontWeight: 'medium', fontSize: 'h3.fontSize', fontFamily: 'Monospace'}}
           />
         </ImageListItem>
       ))}
     </ImageList>
   );
 }
+*/
 
 
 function LoginBox() {
@@ -116,32 +224,34 @@ function LoginBox() {
   return(
     <Container
       maxWidth = "sm"
-      sx={{mt: 5}}
+      sx={{mt: 10}}
     >
       <Box
-        bgcolor="secondary.main"
+        bgcolor={myTheme.palette.secondary.light}
+        sx = {{borderRadius: 3,}}
       >
-      <Typography>
-        field 1
-      </Typography>
-      <form>
-        <TextField
-          onChange = {(e) => setFilecoinTokenAPI(e.target.value)}
-          sx={{mt: 2 }}
-          variant="outlined"
-          fullWidth
+        <Typography
+          sx={{pl: 3, p: 4, fontWeight: 'medium', typography: 'body1', fontSize: 'h6.fontSize', letterSpacing: 6, fontFamily: 'Monospace'}}
         >
-
-        </TextField>
-      </form>
-
-
-
-      <Button
-        onClick = {() => console.log(FilecoinTokenAPI)}
-      >
-        Submit
-      </Button>
+          FileCoin API Key:
+        </Typography>
+  
+          <form>
+            <TextField
+              onChange = {(e) => setFilecoinTokenAPI(e.target.value)}
+              sx={{p: 3, width: 410}}
+              variant="standard"
+            >
+            </TextField>
+          </form>
+        
+        <Button
+          onClick = {() => console.log(FilecoinTokenAPI)}
+          sx={{m: 3, p: 2}}
+          variant = "contained"
+        >
+          Submit
+        </Button>
       </Box>
     </Container>
   )
@@ -149,12 +259,34 @@ function LoginBox() {
 
 
 function App() {
-   return (
+
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
+
+  return (
     <>
-      <FileUpload/>
+      <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+          <Tab label="Login" {...a11yProps(0)} />
+          <Tab label="Gallery" {...a11yProps(1)} />
+        </Tabs>
+      </Box>
+      <TabPanel value={value} index={0}>
+        <LoginBox/>
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        <FileUpload/>
+        <Gallery imageList={dataNFTs}/>
+      </TabPanel>
+    </Box>
+
 
     </>
-   );
+  );
 }
 
 
