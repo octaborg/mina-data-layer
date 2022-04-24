@@ -3,7 +3,11 @@
 ## What is it?
 Project: Creates a Data Acess Layer for expanding the off chain storage for Mina using IPFS with FileCoin.
 
-## How to setup the zkApp?
+
+## Dependencies
+Please ensure you have node v16 and npm installed
+
+## How to setup the zkApp
 1. Clone the following repo and build.
 ```
 cd ../../
@@ -18,7 +22,7 @@ npm install && npm run build
 npm run serve
 ```
 
-## How to use the zkApp?
+## How to use the zkApp
 1. Create an account at https://web3.storage/ and copy your API token. If you don't have one, create one and copy it.
 2. Run in the mina-NFT directory the following commands
 ```
