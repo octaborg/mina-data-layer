@@ -15,11 +15,11 @@ import {deployWallet} from "./wallet.js";
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
+import {File} from "web3.storage";
 
-let Add;
 let address;
 let dataNFTs = [{
-  img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
+  img: "https://ipfs.io/ipfs/bafybeihkfz4qxqmpwnpyiufwp3lysin54h4gf7xizatxntva6ncrmvhi6a/654927.jpeg",
   title: "test1",
 },];
 let name: string;
@@ -35,6 +35,7 @@ let wallet = await deployWallet(account1, account2, Field.zero);
 function FileUpload() {
   
   const [fileToUpload, setFileToUpload] = React.useState<File>();
+  const [imageList, setImageList] = React.useState<any[]>(dataNFTs);
 
   function changeHandler(e: React.ChangeEvent<HTMLInputElement>) {
     const fileList = e.target.files;
@@ -59,8 +60,10 @@ function FileUpload() {
       dataNFTs.push({
         img: address.ipfsUrl,
         title: name,
-      })
-      console.log("worked");
+      });
+      console.log(dataNFTs);
+
+      setFileToUpload(null);
     }
   }
 
@@ -70,6 +73,7 @@ function FileUpload() {
         <input type="file" name="photo" id="image" onChange = {changeHandler}/>
         <button onClick = {uploadHandler} > Mint </button>
       </Stack>
+      <Gallery imageList={imageList}/>
     </Container>
   );
 }
@@ -80,19 +84,18 @@ interface BorrowTableProps {
 }
 
 function Gallery(props: BorrowTableProps) {
-
   const {imageList} = props;
-
 
   return (
     <ImageList>
       {imageList.map((item) => (
         <ImageListItem key={item.img}>
           <img
-            src={`${item.img}?w=248&fit=crop&auto=format`}
-            srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+              crossOrigin="anonymous"
+            src={item.img}
+            //srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
             alt={item.title}
-            loading="lazy"
+            //loading="lazy"
           />
           <ImageListItemBar
             title={item.title}
@@ -103,48 +106,6 @@ function Gallery(props: BorrowTableProps) {
     </ImageList>
   );
 }
-
-
-
-/*
-function InitialBox() {
-  return(
-    
-    <Grid
-    container
-    spacing={0}
-    direction="column"
-    alignItems="center"
-    justifyContent="center"
-    style={{ minHeight: '100vh' }}
-  >
-        <Grid item xs={6}>
-          <Paper>1</Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper>2</Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper>3</Paper>
-        </Grid>
-        <Grid item xs={6}>
-          <Paper>4</Paper>
-        </Grid>
-      </Grid>
-    
-  );
-}
-*/
-
-/*
-const useStyles = makeStyles({
-  field: {
-    marginTop: 20,
-    marginBottom: 20,
-    display: "block"
-  }
-})
-*/
 
 
 function LoginBox() {
@@ -188,44 +149,9 @@ function LoginBox() {
 
 
 function App() {
-  /*
-  let [snapp, setSnapp] = useState();
-  let [isLoading, setLoading] = useState(false);
-  let [isDeployed, setDeployed] = useState(false);
-  let [num, setNum] = useState("0");
-
-  async function deploy() {
-    if (isLoading) return;
-    setLoading(true);
-    Add = await import('../dist/NFT.js');
-    let snapp = await Add.deploy();
-    setLoading(false);
-    setDeployed(true);
-    setSnapp(snapp);
-    let state = await snapp.getSnappState();
-    setNum(state.num.toString());
-  }
-
-  async function handleClick() {
-    await snapp.update();
-    let state = await snapp.getSnappState();
-    setNum(state.num.toString());
-  }
-
-  
-  return (
-    <Container fixed>
-      <Stack direction="column" spacing={2}>
-        <Chip label={num} variant="outlined" onClick={handleClick} disabled={!isDeployed}/>
-        <Button variant="contained" onClick={deploy} disabled={isDeployed}>Deploy</Button>
-      </Stack>
-    </Container>);
-    */
-    
    return (
     <>
       <FileUpload/>
-      <Gallery imageList={dataNFTs}/>
 
     </>
    );
