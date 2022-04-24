@@ -75,10 +75,7 @@ function a11yProps(index: number) {
 }
 
 let address;
-let dataNFTs = [{
-  img: "https://ipfs.io/ipfs/bafybeihkfz4qxqmpwnpyiufwp3lysin54h4gf7xizatxntva6ncrmvhi6a/654927.jpeg",
-  title: "test1",
-},];
+let dataNFTs = [];
 let name: string;
 
 await isReady;
@@ -118,7 +115,7 @@ function FileUpload() {
         img: address.ipfsUrl,
         title: name,
       });
-      console.log(dataNFTs);
+      //console.log(dataNFTs);
 
       setFileToUpload(null);
     }
@@ -283,8 +280,6 @@ function App() {
         <Gallery imageList={dataNFTs}/>
       </TabPanel>
     </Box>
-
-
     </>
   );
 }

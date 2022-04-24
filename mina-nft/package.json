@@ -13,9 +13,9 @@
     "testw": "jest --watch",
     "coverage": "jest --coverage",
     "start": "node gcp/server.js",
-    "serve": "node src/server.js & esbuild --watch --splitting --bundle ./src/App.jsx --outdir=./public/js --format=esm --target=esnext --define:process.env.NODE_ENV='\"development\"'",
-    "local-build": "esbuild --minify --splitting --bundle ./src/App.jsx --outdir=./public/js --format=esm --target=esnext --define:process.env.NODE_ENV='\"production\"'",
-    "build": "esbuild --minify --splitting --bundle ./src/App.jsx --outdir=./gcp/public/js --format=esm --target=esnext --define:process.env.NODE_ENV='\"production\"'",
+    "serve": "node src/server.js & esbuild --watch --splitting --bundle ./src/App.tsx --outdir=./public/js --format=esm --target=esnext --define:process.env.NODE_ENV='\"development\"'",
+    "local-build": "esbuild --minify --splitting --bundle ./src/App.tsx --outdir=./public/js --format=esm --target=esnext --define:process.env.NODE_ENV='\"production\"'",
+    "build": "esbuild --minify --splitting --bundle ./src/App.tsx --outdir=./gcp/public/js --format=esm --target=esnext --define:process.env.NODE_ENV='\"production\"'",
     "format": "prettier --write --ignore-unknown **/*"
   },
   "lint-staged": {
