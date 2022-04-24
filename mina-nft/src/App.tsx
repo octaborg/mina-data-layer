@@ -12,8 +12,17 @@ import {mint, NFTMetaData} from "./NFT.js";
 import {isReady, Mina, Field} from "snarkyjs";
 import {deployWallet} from "./wallet.js";
 
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+
 let Add;
 let address;
+let dataNFTs = [{
+  img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
+  title: "test1",
+},];
+let name: string;
 
 await isReady;
 const Local = Mina.LocalBlockchain();
@@ -40,11 +49,18 @@ function FileUpload() {
     if (fileToUpload) {
       const formData = new FormData();
       formData.append("image", fileToUpload, fileToUpload.name);
+      name = fileToUpload.name;
       console.log(formData.values());
 
       address = await mint(account1, account2, new NFTMetaData(fileToUpload, new Map()));
       await wallet.update(account1, address.address);
       console.log(address.ipfsUrl);
+
+      dataNFTs.push({
+        img: address.ipfsUrl,
+        title: name,
+      })
+      console.log("worked");
     }
   }
 
@@ -57,6 +73,37 @@ function FileUpload() {
     </Container>
   );
 }
+
+interface BorrowTableProps {
+  children?: React.ReactNode;
+  imageList: Array<any>;
+}
+
+function Gallery(props: BorrowTableProps) {
+
+  const {imageList} = props;
+
+
+  return (
+    <ImageList>
+      {imageList.map((item) => (
+        <ImageListItem key={item.img}>
+          <img
+            src={`${item.img}?w=248&fit=crop&auto=format`}
+            srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+            alt={item.title}
+            loading="lazy"
+          />
+          <ImageListItemBar
+            title={item.title}
+            position="below"
+          />
+        </ImageListItem>
+      ))}
+    </ImageList>
+  );
+}
+
 
 
 /*
@@ -176,7 +223,11 @@ function App() {
     */
     
    return (
+    <>
       <FileUpload/>
+      <Gallery imageList={dataNFTs}/>
+
+    </>
    );
 }
 
